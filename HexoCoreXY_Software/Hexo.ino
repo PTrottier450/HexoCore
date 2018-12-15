@@ -31,8 +31,7 @@ void loop()
 	// listen for commands
 	if (Serial.available())
 	{
-		// if something is available
-		char c = Serial.read(); // get it
+		char c = Serial.read(); 
 		Serial.print(c); // optional: repeat back what I got for debugging
 
 						 // store the byte as long as there's room in the buffer.
@@ -144,7 +143,7 @@ bool PositionCommand(char * codePointer)
 
 }
 
-MoveLine()
+MoveLine(int16 Px,int16 Py)
 {
 	int dx = Px - newx;
 	int dy = Py - newy;
