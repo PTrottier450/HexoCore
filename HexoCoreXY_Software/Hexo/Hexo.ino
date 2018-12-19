@@ -3,16 +3,20 @@
 /* Servo for Pen Actuation */
 Servo servopen;
 
+/* Pinout is based on the RAMPS 1.4 configuration */
+
 /* Stepper X control */
-int Pin_X_Step = 23;
-int Pin_X_Dir = 25;
+int Pin_X_Step = 55;	//Pin A0
+int Pin_X_Dir = 56;		//Pin A1
+int Pin_X_En = 38;		//Pin D38
 
 /* Stepper Y control */
-int Pin_Y_Step = 22;
-int Pin_Y_Dir = 24;
+int Pin_Y_Step = 61;	//Pin A6
+int Pin_Y_Dir = 62;		//Pin A7
+int Pin_Y_En = 57;		//Pin A2
 
 /* Stepper movement precision */
-float stepPreision = 0.005; // 0.005mm movement per step see StepX/StepY for details
+float stepPrecision = 0.005; // 0.005mm movement per step see StepX/StepY for details
 
 /* Serial related */
 #define MAX_BUFFER 64
@@ -26,34 +30,42 @@ void setup()
 	/* Pin config for Stepper X */
 	pinMode(Pin_X_Step, OUTPUT);
 	pinMode(Pin_X_Dir, OUTPUT);
+	pinMode(Pin_X_En, OUTPUT);
 
 	/* Pin config for Stepper Y */
 	pinMode(Pin_Y_Step, OUTPUT);
 	pinMode(Pin_Y_Dir, OUTPUT);
+	pinMode(Pin_Y_En, OUTPUT);
 
 	/* Start Servo module on pin 9 */
 	servopen.attach(9);
+
+	/* Enable Stepper drivers */
+	digitalWrite(Pin_X_En, HIGH);
+	digitalWrite(Pin_Y_En, HIGH);
 
 }
 
 void loop()
 {
 	long sofar = 0;
-
+	char dummy[15] = "G01 X1.5 Y1.5";
+	char * dummypointer;
+	dummypointer = dummy;
 	// listen for commands
 	if (Serial.available())
 	{
-		char c = Serial.read(); 
-		Serial.print(c); // optional: repeat back what I got for debugging
+		//char c = Serial.read(); 
+		//Serial.print(c); // optional: repeat back what I got for debugging
 
 						 // store the byte as long as there's room in the buffer.
 						 // if the buffer is full some data might get lost
-		if (sofar < MAX_BUFFER) buffer[sofar++] = c;
+		if (sofar < MAX_BUFFER) buffer[sofar++] = dummypointer;
 
 		// if we got a return character (\n) the message is done.
-		if (c == '\n')
+		if (dummypointer == '\n')
 		{
-			processCommand(c); // do something with the command
+			processCommand(dummypointer); // do something with the command
 		}
 	}
 }
@@ -211,7 +223,7 @@ void StepX(float move,bool direction)
 	{
 		digitalWrite(Pin_X_Dir, LOW );
 	}
-	float distance = move / stepPreision;
+	float distance = move / stepPrecision;
 
 	for (int i = 0; i < distance; i++)
 	{
@@ -233,7 +245,7 @@ void StepY(float move, bool direction)
 	{
 		digitalWrite(Pin_Y_Dir, LOW);
 	}
-	float distance = move / stepPreision;
+	float distance = move / stepPrecision;
 
 	for (int i = 0; i < distance; i++)
 	{
