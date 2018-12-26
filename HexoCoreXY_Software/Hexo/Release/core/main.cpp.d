@@ -1,6 +1,6 @@
-C:\Users\PierreOlivier\AppData\Local\Temp\VMBuilds\Hexo\mega_atmega2560\Release\Hexo.cpp.o: \
- C:\Users\PierreOlivier\AppData\Local\Temp\VMBuilds\Hexo\mega_atmega2560\Release\Hexo.cpp \
- C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\cores\arduino/arduino.h \
+C:\Users\PierreOlivier\AppData\Local\Temp\VMBuilds\Hexo\mega_atmega2560\Release\core\main.cpp.o: \
+ C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\cores\arduino\main.cpp \
+ C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\cores\arduino/Arduino.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\cores\arduino/binary.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\cores\arduino/WCharacter.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\cores\arduino/WString.h \
@@ -10,6 +10,4 @@ C:\Users\PierreOlivier\AppData\Local\Temp\VMBuilds\Hexo\mega_atmega2560\Release\
  C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\cores\arduino/Printable.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\cores\arduino/USBAPI.h \
  C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\cores\arduino/Arduino.h \
- C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\variants\mega/pins_arduino.h \
- C:\Program\ Files\ (x86)\Arduino\libraries\Servo\src/servo.h \
- C:\Program\ Files\ (x86)\Arduino\libraries\Servo\src/avr/ServoTimers.h
+ C:\Program\ Files\ (x86)\Arduino\hardware\arduino\avr\variants\mega/pins_arduino.h

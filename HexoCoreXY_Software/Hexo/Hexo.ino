@@ -1,4 +1,4 @@
-#include <servo.h>
+#include <Servo.h>
 
 /* Servo for Pen Actuation */
 Servo servopen;
