@@ -6,14 +6,14 @@ Servo servopen;
 /* Pinout is based on the RAMPS 1.4 configuration */
 
 /* Stepper X control */
-int Pin_X_Step = 55;	//Pin A0
-int Pin_X_Dir = 56;		//Pin A1
+int Pin_X_Step = 54;	//Pin A0
+int Pin_X_Dir = 55;		//Pin A1
 int Pin_X_En = 38;		//Pin D38
 
 /* Stepper Y control */
-int Pin_Y_Step = 61;	//Pin A6
-int Pin_Y_Dir = 62;		//Pin A7
-int Pin_Y_En = 57;		//Pin A2
+int Pin_Y_Step = 60;	//Pin A6
+int Pin_Y_Dir = 61;		//Pin A7
+int Pin_Y_En = 56;		//Pin A2
 
 /* Stepper movement precision */
 float stepPrecision = 0.005; // 0.005mm movement per step see StepX/StepY for details
@@ -26,6 +26,7 @@ void setup()
 {
 	/* Serial command line begin */
 	Serial.begin(9600);
+  Serial.println("Begin !");
 
 	/* Pin config for Stepper X */
 	pinMode(Pin_X_Step, OUTPUT);
@@ -37,37 +38,23 @@ void setup()
 	pinMode(Pin_Y_Dir, OUTPUT);
 	pinMode(Pin_Y_En, OUTPUT);
 
-	/* Start Servo module on pin 9 */
-	servopen.attach(9);
+	/* Start Servo module on pin 4 */
+	servopen.attach(4);
 
 	/* Enable Stepper drivers */
-	digitalWrite(Pin_X_En, HIGH);
-	digitalWrite(Pin_Y_En, HIGH);
+	digitalWrite(Pin_X_En, LOW);
+	digitalWrite(Pin_Y_En, LOW);
 
 }
 
 void loop()
 {
 	long sofar = 0;
-	char dummy[15] = "G01 X1.5 Y1.5";
+	char dummy[15] = "G00 X1.75 Y1.75";
 	char * dummypointer;
 	dummypointer = dummy;
-	// listen for commands
-	if (Serial.available())
-	{
-		//char c = Serial.read(); 
-		//Serial.print(c); // optional: repeat back what I got for debugging
-
-						 // store the byte as long as there's room in the buffer.
-						 // if the buffer is full some data might get lost
-		if (sofar < MAX_BUFFER) buffer[sofar++] = dummypointer;
-
-		// if we got a return character (\n) the message is done.
-		if (dummypointer == '\n')
-		{
-			processCommand(dummypointer); // do something with the command
-		}
-	}
+	processCommand(dummypointer); // do something with the command
+  delay(1000);
 }
 
 bool processCommand(char * codePointer)
@@ -75,6 +62,7 @@ bool processCommand(char * codePointer)
 	/* Start reading the first letter to determine the command */
 	switch (codePointer[0]) {
 	case 'G':	/* Motor Command */
+    Serial.println(codePointer[0]);
 		PositionCommand(codePointer);
 		break;
 	default:	/* Unsupported Command */
@@ -90,9 +78,47 @@ bool PositionCommand(char * codePointer)
 	int j = 0;
 	float moveValue;
 	float moveValueX, moveValueY;
-
+  Serial.println(codePointer[2]);
 	switch (codePointer[2]) {
-	case 0: /* Rapid Motion G00 */
+	case '0': /* Rapid Motion G00 */
+    Serial.println("CASE 0");
+		while (codePointer[i] != 'X')
+		{
+			i++;
+		}
+
+		j = 0;
+		while (codePointer[i] != ' ')
+		{
+			i++;
+			BufferArray[j] = codePointer[i];
+      j++;
+		}
+		moveValueX = (float)atof(BufferArray);
+
+		while (codePointer[i] != 'Y')
+		{
+			i++;
+		}
+
+		j = 0;
+		while (codePointer[i] != ' ')
+		{
+			i++;
+			BufferArray[j] = codePointer[i];
+      j++;
+		}
+		moveValueY = (float)atof(BufferArray);
+    
+		MoveLine(moveValueX, moveValueY);
+
+    ActivatePen();
+    DeactivatePen();
+
+		break;
+
+	case '1': /* Controlled Rapid Motion G01 */
+    Serial.println("CASE 1");
 		while (codePointer[i] != 'X')
 		{
 			i++;
@@ -118,52 +144,26 @@ bool PositionCommand(char * codePointer)
 			BufferArray[j] = codePointer[i];
 		}
 		moveValueY = (float)atof(BufferArray);
-
 		MoveLine(moveValueX, moveValueY);
 
 		break;
 
-	case 1: /* Controlled Rapid Motion G01 */
-		while (codePointer[i] != 'X')
-		{
-			i++;
-		}
-
-		j = 0;
-		while (codePointer[i] != ' ')
-		{
-			i++;
-			BufferArray[j] = codePointer[i];
-		}
-		moveValueX = (float)atof(BufferArray);
-
-		while (codePointer[i] != 'Y')
-		{
-			i++;
-		}
-
-		j = 0;
-		while (codePointer[i] != ' ')
-		{
-			i++;
-			BufferArray[j] = codePointer[i];
-		}
-		moveValueY = (float)atof(BufferArray);
-		MoveLine(moveValueX, moveValueY);
+	case '2': /* Clockwise Motion */
 
 		break;
 
-	case 2: /* Clockwise Motion */
-
-		break;
-
-	case 3: /* Counter Clockwise repositionning */
+	case '3': /* Counter Clockwise repositionning */
 
 		break;
 
 	case 28: /* Return to home */
 
 		break;
+
+  default:
+    Serial.println("INVALID CASE");
+    break;
+  
 	}
 }
 
@@ -181,6 +181,8 @@ void MoveLine(float newx,float newy)
 
 	int over = 0;
 
+  Serial.println("MovingLine");
+
 	if (dx>dy) {
 		over = dx / 2;
 		for (int i = 0; i<dx; ++i) {
@@ -190,7 +192,6 @@ void MoveLine(float newx,float newy)
 				over -= dx;
 				StepY(dy, directionY);
 			}
-			delay(10);
 		}
 	}
 	else {
@@ -202,7 +203,6 @@ void MoveLine(float newx,float newy)
 				over -= dy;
 				StepX(dx, directionX);
 			}
-			delay(10);
 		}
 	}
 
@@ -218,16 +218,19 @@ void StepX(float move,bool direction)
 	if (direction == 0)
 	{
 		digitalWrite(Pin_X_Dir, HIGH);
+    Serial.println("Dir X HIGH");
 	}
 	else if (direction == 1)
 	{
 		digitalWrite(Pin_X_Dir, LOW );
+    Serial.println("Dir X LOW");
 	}
 	float distance = move / stepPrecision;
 
 	for (int i = 0; i < distance; i++)
 	{
 		digitalWrite(Pin_X_Step, HIGH);
+    delay(1);
 		digitalWrite(Pin_X_Step, LOW);
 	}
 }
@@ -240,16 +243,19 @@ void StepY(float move, bool direction)
 	if (direction == 0)
 	{
 		digitalWrite(Pin_Y_Dir, HIGH);
+    Serial.println("Dir Y HIGH");
 	}
 	else if (direction == 1)
 	{
 		digitalWrite(Pin_Y_Dir, LOW);
+    Serial.println("Dir Y LOW");
 	}
 	float distance = move / stepPrecision;
 
 	for (int i = 0; i < distance; i++)
 	{
 		digitalWrite(Pin_Y_Step, HIGH);
+    delay(1);
 		digitalWrite(Pin_Y_Step, LOW);
 	}
 }
@@ -261,7 +267,7 @@ void ActivatePen()		/* Activate Servo for pen control */
 
 void DeactivatePen()	/* Deactivate Servo for pen control */
 {
-	servopen.write(00);
+	servopen.write(10);
 }
 /*
 MoveLineSpeed()
